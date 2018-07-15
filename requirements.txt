@@ -17,7 +17,6 @@ ipaddress==1.0.22
 lxml==4.2.1
 parsel==1.4.0
 peewee==3.5.2
-protobuf==3.5.1
 pyasn1==0.4.2
 pyasn1-modules==0.2.1
 pycparser==2.18
@@ -29,9 +28,10 @@ PyPika==0.14.8
 python-dotenv==0.8.2
 pyzk==0.6
 queuelib==1.5.0
+redis==2.10.6
 requests==2.18.4
+Scrapy==1.5.0
 service-identity==17.0.0
-six==1.11.0
 tqdm==4.23.0
 Twisted==18.4.0
 urllib3==1.22

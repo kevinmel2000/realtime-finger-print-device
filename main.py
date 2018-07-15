@@ -3,10 +3,13 @@ from zk import ZK, const
 from pymitter import EventEmitter
 from models import Attendance_Logs
 from config import DEVICE_IP, DEVICE_PORT, DEVICE_TIMEOUT
+import redis
+import json
 
 ee = EventEmitter()
 conn = None
 zk = ZK(DEVICE_IP, DEVICE_PORT, DEVICE_TIMEOUT)
+# conn = zk.connect()
 
 # make listener from event attendace_log_available
 @ee.on("attendace_log_available")
@@ -41,18 +44,40 @@ def check():
             conn.clear_attendance()
 
         #disconnect device
-        conn.disconnect()
+        # conn.disconnect()
     except Exception, e:
         print "Process terminate : {}".format(e)
 
 
-def main():
-    # infinite loop
-    while True:
-        check()
+def handler(msg):
+    if msg['data'] != 1:
+        data = json.loads(msg['data'])
 
-        # sleeptime : 1s
-        time.sleep(1)
+        try:
+            ZK2 = ZK(data['ip'], data['port'], DEVICE_TIMEOUT)
+            conn2 = ZK2.connect()
+            conn2.test_voice()
+            print "machine ip = {}, test voice ->> success".format(data['ip'])
+        except Exception, e:
+            print e
+
+def main():
+
+    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    p = r.pubsub()
+    p.subscribe('@machine/test_voice')
+
+    while True:
+        msg = p.get_message()
+        if msg:
+            handler(msg)
+
+    # infinite loop
+    # while True:
+    #     check()
+
+    #     # sleeptime : 1s
+    #     time.sleep(1)
 
 if __name__ == "__main__":
     main()
